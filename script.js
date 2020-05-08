@@ -105,6 +105,33 @@ function translate() {
     }
 
     var str2 = "\"" + lines.join("\n") + "\"";
+    str2 = str2.split("%%").join('%');
+    str2 = str2.split("%n").join("");
+    str2 = str2.split("%x").join("{:x}");
+    str2 = str2.split("%X").join("{:X}");
+    str2 = str2.split("%s").join("{}");
+    str2 = str2.split("%u").join("{}");
+    str2 = str2.split("%p").join("{:#x}");
+    str2 = str2.split("%o").join("{:o}");
+    str2 = str2.split("%llu").join("{}");
+    str2 = str2.split("%lli").join("{}");
+    str2 = str2.split("%lld").join("{}");
+    str2 = str2.split("%lu").join("{}");
+    str2 = str2.split("%Lf").join("{}");
+    str2 = str2.split("%lf").join("{}");
+    str2 = str2.split("%l").join("{}");
+    str2 = str2.split("%ld").join("{}");
+    str2 = str2.split("%li").join("{}");
+    str2 = str2.split("%i").join("{}");
+    str2 = str2.split("%hu").join("{}");
+    str2 = str2.split("%hi").join("{}");
+    str2 = str2.split("%g").join("{}");
+    str2 = str2.split("%G").join("{}");
+    str2 = str2.split("%f").join("{}");
+    str2 = str2.split("%e").join("{}");
+    str2 = str2.split("%E").join("{}");
+    str2 = str2.split("%d").join("{}");
+    str2 = str2.split("%c").join("{}");
 
     document.getElementById("target").innerHTML = str2;
 }
