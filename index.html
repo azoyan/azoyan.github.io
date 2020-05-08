@@ -9,14 +9,14 @@
 <body>
     <div class="source">
         <label>C multiline string literal</label>
-        <textarea id="source" rows="20" onchange="translate()" onkeyup="translate()" onpaste="translate()">
+        <textarea id="source" rows="20">
 "\nFROM pg_catalog.pg_class c"
 " JOIN pg_catalog.pg_inherits i"
 " ON c.oid = inhrelid"
 "\nWHERE c.oid = '%s';"</textarea>
     </div>
     <div>
-        <button onclick="translate()">Convert</button>
+        <button id="convert">Convert</button>
     </div>
     <div class="target">
         <label>Rust multiline string literal</label>
@@ -26,5 +26,12 @@
         <button onclick="copy()">Copy</button>
     </div>
 </body>
+
+<script>
+    document.getElementById("source").addEventListener("change", translate);
+    document.getElementById("source").addEventListener("keyup", translate);
+    document.getElementById("source").addEventListener("paste", translate);
+    document.getElementById("convert").addEventListener("click", translate);
+</script>
 
 </html>
