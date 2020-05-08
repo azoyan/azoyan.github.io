@@ -53,28 +53,17 @@ function translate() {
     var str = document.getElementById("source").value;
     var lines = str.split(/\r?\n/);
 
-
     var ok = true;
 
     var escapeWithDoubleQuotes = getIndicesOf("\\\"", str);
     for (var i = 0; i < escapeWithDoubleQuotes.length; ++i) {
         escapeWithDoubleQuotes[i] += 1;
     }
-    var escapeWithDoubleQuotesCount = escapeWithDoubleQuotes.length
     var doubleQuotes = getIndicesOf("\"", str);
     var aloneDoubleQuotes = diff(doubleQuotes, escapeWithDoubleQuotes);
     var aloneDoubleQuotesCount = aloneDoubleQuotes.length
     ok = (aloneDoubleQuotesCount % 2) === 0
 
-    var result = []
-    for (var i = 0; i < lines.length; ++i) {
-        var line = lines[i];
-        line = line.trim();
-        result.push(line)
-        ok = ok && (line.charAt(0) === "\"") && (line.charAt(line.length - 1) === "\"")
-    }
-
-    lines = result
     result = []
     for (var i = 0; i < lines.length; ++i) {
         var line = lines[i];
