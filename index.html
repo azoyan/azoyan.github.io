@@ -9,7 +9,12 @@
 <body>
     <div class="source">
         <label>C multiline string literal</label>
-        <textarea id="source" rows="20" onchange="translate()" onkeyup="translate()" onpaste="translate()"></textarea>
+        <textarea id="source" rows="20" onchange="translate()" onkeyup="translate()" onpaste="translate()">
+        "\nFROM pg_catalog.pg_class c"
+" JOIN pg_catalog.pg_inherits i"
+" ON c.oid = inhrelid"
+"\nWHERE c.oid = '%s';"
+        </textarea>
     </div>
     <div>
         <button onclick="translate()">Convert</button>
