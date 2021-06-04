@@ -10,117 +10,62 @@ function copy() {
     document.execCommand("copy");
 }
 
-function getIndicesOf(searchStr, str, caseSensitive) {
-    var searchStrLen = searchStr.length;
-    if (searchStrLen == 0) {
-        return [];
-    }
-    var startIndex = 0, index, indices = [];
-    if (!caseSensitive) {
-        str = str.toLowerCase();
-        searchStr = searchStr.toLowerCase();
-    }
-    while ((index = str.indexOf(searchStr, startIndex)) > -1) {
-        indices.push(index);
-        startIndex = index + searchStrLen;
-    }
-    return indices;
-}
-
-function diff(a1, a2) {
-    var a = [], diff = [];
-    for (var i = 0; i < a1.length; i++) {
-        a[a1[i]] = true;
-    }
-    for (var i = 0; i < a2.length; i++) {
-        if (a[a2[i]]) {
-            delete a[a2[i]];
-        } else {
-            a[a2[i]] = true;
-        }
-    }
-    for (var k in a) {
-        diff.push(k);
-    }
-    return diff;
-}
-
-function isWhitespace(str) {
-    return str.length === 1 && str.match(/\s/);
-}
 
 function translate() {
     var str = document.getElementById("source").value;
-    var lines = str.split(/\r?\n/);
+    let lines = str.split(/\r?\n/);
 
-    var ok = true;
+    let result = 'WEBVTT\nKind: captions\nLanguage: en\n\n'
 
-    var escapeWithDoubleQuotes = getIndicesOf("\\\"", str);
-    for (var i = 0; i < escapeWithDoubleQuotes.length; ++i) {
-        escapeWithDoubleQuotes[i] += 1;
-    }
-    var doubleQuotes = getIndicesOf("\"", str);
-    var aloneDoubleQuotes = diff(doubleQuotes, escapeWithDoubleQuotes);
-    var aloneDoubleQuotesCount = aloneDoubleQuotes.length
-    ok = (aloneDoubleQuotesCount % 2) === 0
-
-    result = []
-    for (var i = 0; i < lines.length; ++i) {
-        var line = lines[i];
-        line = line.trim();
-        line = line.slice(0, line.length - 1) + line.slice(line.length);
-        line = line.slice(1);
-        result.push(line);
-    }
-
-    lines = []
-    for (var i = 1; i < result.length; ++i) {
-        var line = result[i];
-        var prevLine = result[i - 1];
-        var spaces = 0
-        var space = " "
-        for (var j = 0; j < line.length - 1; ++j) {
-            if (line.charAt(j) === ' ') { spaces += 1; }
-            else { break; }
-        }
-        result[i] = result[i].trim()
-        lines.push(prevLine + space.repeat(spaces) + "\\");
-        if (i === result.length - 1) {
-            lines.push(line);
+    let timecodes = []
+    let descriptions = []
+    for (let i = 0; i < lines.length; ++i) {
+        let splitted_line = lines[i].split('➡️')
+        console.log(splitted_line)
+        if (splitted_line.length > 1) {
+            timecodes.push(splitted_line[0].replace(/(^[\s]+|[\s]+$)/g, ''))
+            descriptions.push(splitted_line[1].replace(/(^[\s]+|[\s]+$)/g, ''))
         }
     }
-    for (var i = 1; i < result.length; ++i) {
-        lines[i] = lines[i].trim();
+
+    function pad(num, size) {
+        num = num.toString();
+        while (num.length < size) num = "0" + num;
+        return num;
     }
 
-    var str2 = "\"" + lines.join("\n") + "\"";
-    str2 = str2.split("%%").join('%');
-    str2 = str2.split("%n").join("");
-    str2 = str2.split("%x").join("{:x}");
-    str2 = str2.split("%X").join("{:X}");
-    str2 = str2.split("%s").join("{}");
-    str2 = str2.split("%u").join("{}");
-    str2 = str2.split("%p").join("{:#x}");
-    str2 = str2.split("%o").join("{:o}");
-    str2 = str2.split("%llu").join("{}");
-    str2 = str2.split("%lli").join("{}");
-    str2 = str2.split("%lld").join("{}");
-    str2 = str2.split("%lu").join("{}");
-    str2 = str2.split("%Lf").join("{}");
-    str2 = str2.split("%lf").join("{}");
-    str2 = str2.split("%l").join("{}");
-    str2 = str2.split("%ld").join("{}");
-    str2 = str2.split("%li").join("{}");
-    str2 = str2.split("%i").join("{}");
-    str2 = str2.split("%hu").join("{}");
-    str2 = str2.split("%hi").join("{}");
-    str2 = str2.split("%g").join("{}");
-    str2 = str2.split("%G").join("{}");
-    str2 = str2.split("%f").join("{}");
-    str2 = str2.split("%e").join("{}");
-    str2 = str2.split("%E").join("{}");
-    str2 = str2.split("%d").join("{}");
-    str2 = str2.split("%c").join("{}");
+    class Time {
+        constructor(time_str) {
+            let raw_strings = time_str.split(':').reverse()
+            this.seconds = parseInt(raw_strings[0] ? raw_strings[0] : "00")
+            this.minutes = parseInt(raw_strings[1] ? raw_strings[1] : "00")
+            this.hours = parseInt(raw_strings[2] ? raw_strings[2] : "00")
+        }
 
-    document.getElementById("target").innerHTML = str2;
+        tostring() {
+            let s = '' + pad(this.hours, 2) + ':' + pad(this.minutes, 2) + ':' + pad(this.seconds, 2) + '.000'
+            return s
+        }
+        add_one_minute() {
+            if ((this.minutes + 1) > 60) {
+                this.hours += 1
+                this.minutes = 0
+            } else {
+                this.minutes += 1
+            }
+            return this
+        }
+    }
+
+    let vtt = []
+    for (let i = 0; i < timecodes.length; ++i) {
+        let time1 = new Time(timecodes[i])
+        let time1str = time1.tostring()
+        let time2 = ((i + 1 < timecodes.length) ?
+            new Time(timecodes[i + 1]) : time1.add_one_minute()).tostring()
+
+        let vtt_time = time1str + ' --> ' + time2 + '\n' + descriptions[i] + '\n\n';
+        vtt.push(vtt_time)
+    }
+    document.getElementById("target").innerHTML = result + vtt.join('');
 }
