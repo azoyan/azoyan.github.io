@@ -39,11 +39,11 @@ class Time {
     }
 }
 
-String.prototype.decodeHTML = function() {
-    var map = {"gt":">" /* , … */};
-    return this.replace(/&(#(?:x[0-9a-f]+|\d+)|[a-z]+);?/gi, function($0, $1) {
+String.prototype.decodeHTML = function () {
+    var map = { "gt": ">" /* , … */ };
+    return this.replace(/&(#(?:x[0-9a-f]+|\d+)|[a-z]+);?/gi, function ($0, $1) {
         if ($1[0] === "#") {
-            return String.fromCharCode($1[1].toLowerCase() === "x" ? parseInt($1.substr(2), 16)  : parseInt($1.substr(1), 10));
+            return String.fromCharCode($1[1].toLowerCase() === "x" ? parseInt($1.substr(2), 16) : parseInt($1.substr(1), 10));
         } else {
             return map.hasOwnProperty($1) ? map[$1] : $0;
         }
@@ -72,10 +72,11 @@ function translate() {
 
     let result = 'WEBVTT\nKind: captions\nLanguage: en\n\n'
 
-    const regex = new RegExp(/(?:\d\d(?::)\d\d)/)
-    const regex_multiline = new RegExp(/(?:\d\d(?::)\d\d)/igm)
+    const regex = new RegExp(/(?:\d\d:\d\d:\d\d|\d\d:\d\d)/)
+    const regex_multiline = new RegExp(/(?:\d\d:\d\d:\d\d|\d\d:\d\d)/igm)
 
     let descriptions = str.split(regex)
+    console.log(descriptions)
     descriptions = descriptions.filter(function (el) {
         return el != null && el.length > 0
     })
@@ -85,13 +86,14 @@ function translate() {
     descriptions.forEach(element => {
         return element.replace("➡️", '')
     });
-    console.log(descriptions)
+    // console.log(descriptions)
     let timecodes = []
 
     while (match = regex_multiline.exec(str)) {
+        // console.log(match)
         timecodes.push(match.toString())
     }
-    console.log(timecodes)
+    // console.log(timecodes)
 
     let vtt = []
     for (let i = 0; i < timecodes.length; ++i) {
@@ -99,7 +101,7 @@ function translate() {
         let time1str = time1.tostring()
         let time2 = ((i + 1 < timecodes.length) ?
             new Time(timecodes[i + 1]) : time1.add_one_minute()).tostring()
-
+        // console.log(descriptions[i])
         let vtt_time = time1str + ' --> ' + time2 + '\n' + descriptions[i] + '\n\n';
         vtt.push(vtt_time)
     }
